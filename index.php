@@ -1,10 +1,5 @@
 <?php
-ini_set('session.use_cookies', 1);
-ini_set('session.use_only_cookies', 1);
-ini_set('session.cookie_secure', 1); // Cloud Run = HTTPS
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_samesite', 'None');
-
+session_save_path('/tmp');
 session_start();
 
 require __DIR__ . '/vendor/autoload.php';
