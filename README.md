@@ -6,6 +6,7 @@
 ## Run Local
 ```bash
 php -S localhost:8080
+# GoogleAuth ClientID Web allow localhost at port 8080
 ```
 
 ## Job
@@ -13,8 +14,7 @@ php -S localhost:8080
 - koneksi Cloud SQL untuk simpan data (team, voters, rating)
 - UI: one map with booth of conference.
 
-Prilia Melani Puspita
-Florecita Wenny
-Athallah Rizky Erin Saputra
-Saskia Mecca Widyarni
-Regisha Sheren
+## Page/Widget
+Page using widget load using API route.
+- Index Page (aula pameran).
+- Leaderboard.
