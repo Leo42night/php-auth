@@ -1,27 +1,42 @@
 <?php
-session_start();
+require __DIR__ . '/vendor/autoload.php';
 
-// Konfigurasi Google OAuth
-$clientId = getenv('GOOGLE_CLIENT_ID') ?: "690018681390-b871npco41agqt652a2vp8a2jg7u01kp.apps.googleusercontent.com";
-$redirectUri = getenv('GOOGLE_REDIRECT_URI') ?: 'http://localhost:8080/callback.php';
+use Firebase\JWT\JWT;
 
-// Generate state untuk security
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$secret = $_ENV['JWT_SECRET'];
+
+// Generate random state
 $state = bin2hex(random_bytes(16));
-$_SESSION['oauth_state'] = $state;
 
-// Parameter untuk Google OAuth
-$params = [
-    'client_id' => $clientId,
-    'redirect_uri' => $redirectUri,
-    'response_type' => 'code',
-    'scope' => 'openid email profile',
+// Payload JWT state
+$payload = [
     'state' => $state,
-    'access_type' => 'online',
-    'prompt' => 'select_account'
+    'exp' => time() + 300
 ];
 
+// Encode JWT
+$jwt = JWT::encode($payload, $secret, 'HS256');
+
+// Simpan cookie HttpOnly
+setcookie("oauth_state_token", $jwt, [
+    'expires' => time() + 300,
+    'httponly' => true,
+    'secure' => isset($_SERVER['HTTPS']),
+    'path' => '/',
+    'samesite' => 'Lax'
+]);
+
 // Redirect ke Google OAuth
-$authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
-header('Location: ' . $authUrl);
+$googleAuthUrl = "https://accounts.google.com/o/oauth2/auth?" . http_build_query([
+    'client_id' => $_ENV['GOOGLE_CLIENT_ID'],
+    'redirect_uri' => $_ENV['GOOGLE_REDIRECT_URI'],
+    'response_type' => 'code',
+    'scope' => 'openid email profile',
+    'state' => $state
+]);
+
+header("Location: $googleAuthUrl");
 exit;
-?>
